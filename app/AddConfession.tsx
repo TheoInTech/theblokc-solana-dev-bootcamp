@@ -75,10 +75,7 @@ const AddConfession = () => {
   const handleRefresh = async (e: any) => {
     e.preventDefault();
 
-    await router.refresh();
-
-    await getAllConfessions();
-    await findProfileAccounts();
+    await window.location.reload();
   };
 
   return (
