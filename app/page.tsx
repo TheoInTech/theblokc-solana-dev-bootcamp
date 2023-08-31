@@ -1,6 +1,6 @@
 // components
 import { ConnectWallet } from "@/app/components/ConnectWallet";
-import { Particles } from "./components/Particles";
+import { Particles } from "@/app/components/Particles";
 // assets
 import Logo from "public/assets/logo-with-text.svg";
 // custom components
