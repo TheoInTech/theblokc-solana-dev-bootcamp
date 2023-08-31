@@ -7,14 +7,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "knip": "knip"
+    "knip": "knip",
+    "solana:get-program-id": "solana address -k target/deploy/solana_confessions-keypair.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
     "@project-serum/anchor": "^0.26.0",
+    "@radix-ui/react-alert-dialog": "^1.0.4",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-toast": "^1.1.4",
     "@remix-run/react": "^1.19.3",
     "@remix-run/server-runtime": "^1.19.3",
     "@solana/wallet-adapter-base": "^0.9.23",

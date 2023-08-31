@@ -1,9 +1,12 @@
 "use client";
 
-import { PROGRAM_PUBKEY } from "@/lib/constants";
-import profileIdl from "@/lib/idl";
+import {
+  PROGRAM_INTERFACE,
+  PROGRAM_PUBKEY,
+  commitmentLevel,
+} from "@/lib/constants";
 import { getFilteredAuthor } from "@/lib/utils/getFilteredAuthor";
-import * as anchor from "@project-serum/anchor";
+import { AnchorProvider, Program, ProgramAccount } from "@project-serum/anchor";
 import { utf8 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import {
@@ -26,22 +29,16 @@ export const useProgram = () => {
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
-  const [userConfessions, setUserConfessions] = useState<
-    anchor.ProgramAccount[]
-  >([]);
-  const [allConfessions, setAllConfessions] = useState<anchor.ProgramAccount[]>(
-    []
-  );
+  const [userConfessions, setUserConfessions] = useState<ProgramAccount[]>([]);
+  const [allConfessions, setAllConfessions] = useState<ProgramAccount[]>([]);
   const [lastConfession, setLastConfession] = useState<number>(0);
 
   const program = useMemo(() => {
     if (anchorWallet) {
-      const provider = new anchor.AnchorProvider(
-        connection,
-        anchorWallet,
-        anchor.AnchorProvider.defaultOptions()
-      );
-      return new anchor.Program(profileIdl as any, PROGRAM_PUBKEY, provider);
+      const provider = new AnchorProvider(connection, anchorWallet, {
+        preflightCommitment: commitmentLevel,
+      });
+      return new Program(PROGRAM_INTERFACE, PROGRAM_PUBKEY, provider);
     }
   }, [connection, anchorWallet]);
 
@@ -58,11 +55,13 @@ export const useProgram = () => {
             profilePda
           );
 
+          console.log("profileAccount", profileAccount);
+
           if (profileAccount) {
             setLastConfession(profileAccount.lastConfession);
             setIsInitialized(true);
 
-            const confessionAccount: anchor.ProgramAccount[] =
+            const confessionAccount: ProgramAccount[] =
               await program.account.confessionAccount.all([
                 getFilteredAuthor(publicKey.toString()),
               ]);
@@ -81,25 +80,14 @@ export const useProgram = () => {
     };
 
     const getAllConfessions = async () => {
-      // console.log("program", program);
-      // console.log("publicKey", publicKey);
-      // console.log("isTransactionPending", isTransactionPending);
-      // console.log(
-      //   "should go through",
-      //   program && publicKey && !isTransactionPending
-      // );
       if (program && publicKey && !isTransactionPending) {
         try {
-          // console.log(
-          //   "ASDHAIOSHFOIAHFIOAHSIOFHAISFHAOISHFIOAHFIOHAFHAI",
-          //   await program.account
-          // );
           setIsLoading(true);
           const confessions = await program.account.confessionAccount.all([]);
 
           setAllConfessions(confessions);
         } catch (error) {
-          console.log(error);
+          console.error(error);
           setIsInitialized(false);
           setAllConfessions([]);
         } finally {
@@ -127,8 +115,6 @@ export const useProgram = () => {
           getFilteredAuthor(publicKey.toString()),
         ]);
 
-        console.log("isAlreadyInitialized", isAlreadyInitialized);
-
         setIsTransactionPending(true);
         const [profilePda, profileBump] = findProgramAddressSync(
           [utf8.encode("USER_STATE"), publicKey.toBuffer()],
@@ -144,7 +130,6 @@ export const useProgram = () => {
           })
           .rpc();
 
-        console.log("tx", tx);
         setIsInitialized(true);
       } catch (error: any) {
         console.error(error);
@@ -178,7 +163,7 @@ export const useProgram = () => {
           program.programId
         );
 
-        await program.methods
+        const tx = await program.methods
           .addConfession(confession)
           .accounts({
             userProfile: profilePda,
@@ -187,12 +172,18 @@ export const useProgram = () => {
             systemProgram: SystemProgram.programId,
           })
           .rpc();
-        setSuccessMessage("Successfully added a confession.");
-      } catch (error: any) {
-        console.log(error);
-        setErrorMessage(error);
-      } finally {
+
+        setSuccessMessage(
+          "Your confession is now forever in the blockchain, anonymously."
+        );
         setIsTransactionPending(false);
+        return { success: tx };
+      } catch (error: any) {
+        console.error(error);
+        setErrorMessage(error);
+        setIsTransactionPending(false);
+
+        return { error };
       }
     }
   };

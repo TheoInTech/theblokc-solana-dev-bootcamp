@@ -1,8 +1,11 @@
 "use client";
 
-import { useProgram } from "@/app/hooks/useProgram";
-import { shortenAddress } from "@/lib/utils/shortenAddress";
+// next
 import Link from "next/link";
+// hooks
+import { useProgram } from "@/app/hooks/useProgram";
+// utils
+import { shortenAddress } from "@/lib/utils/shortenAddress";
 
 const dummyConfessions = [
   {
@@ -66,35 +69,43 @@ const AllConfessions = () => {
   const { isLoading, program, isInitialized, allConfessions, userConfessions } =
     useProgram();
 
-  console.log("allConfessions", allConfessions);
   return (
-    <div className="rounded-lg p-8 overflow-scroll flex flex-col gap-4 bg-muted/30 w-full h-[22rem] text-primary backdrop-blur-sm">
-      {dummyConfessions.map(({ confession, author, tx }, i) => (
-        <div
-          key={`${author}-${confession}-${i}`}
-          className="w-full border border-border p-4 rounded-lg"
-        >
-          <div className="flex flex-col gap-8 justify-between">
-            <p className="text-xl">{confession}</p>
+    <div className="rounded-lg p-8 overflow-scroll flex flex-col items-center justify-center gap-4 bg-muted/30 w-full h-[22rem] text-primary backdrop-blur-sm">
+      {allConfessions.length > 0 ? (
+        <>
+          {/* Change to actual all confessions */}
+          {dummyConfessions.map(({ confession, author, tx }, i) => (
+            <div
+              key={`${author}-${confession}-${i}`}
+              className="w-full border border-border p-4 rounded-lg"
+            >
+              <div className="flex flex-col gap-8 justify-between">
+                <p className="text-xl">{confession}</p>
 
-            <div className="flex gap-4 self-end">
-              <Link
-                href={`https://explorer.solana.com/address/${author}?cluster=devnet`}
-                className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
-              >
-                by: {shortenAddress(author)}
-              </Link>
-              <div className="w-[1px] bg-border"></div>
-              <Link
-                href={`https://explorer.solana.com/address/${tx}?cluster=devnet`}
-                className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
-              >
-                tx: {shortenAddress(tx)}
-              </Link>
+                <div className="flex gap-4 self-end">
+                  <Link
+                    href={`https://explorer.solana.com/address/${author}?cluster=devnet`}
+                    className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
+                  >
+                    by: {shortenAddress(author)}
+                  </Link>
+                  <div className="w-[1px] bg-border"></div>
+                  <Link
+                    href={`https://explorer.solana.com/address/${tx}?cluster=devnet`}
+                    className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
+                  >
+                    tx: {shortenAddress(tx)}
+                  </Link>
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
+        </>
+      ) : (
+        <div className="flex w-full items-center justify-center">
+          <p className="text-xl">No confessions yet. Be the first.</p>
         </div>
-      ))}
+      )}
     </div>
   );
 };

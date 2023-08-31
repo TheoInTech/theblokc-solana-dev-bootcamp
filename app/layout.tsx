@@ -1,3 +1,4 @@
+import { Toaster } from "@/app/components/Toast";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -31,7 +32,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <WalletConnectProvider>{children}</WalletConnectProvider>
+        <WalletConnectProvider>
+          <main>{children}</main>
+          <Toaster />
+        </WalletConnectProvider>
       </body>
     </html>
   );
