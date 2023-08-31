@@ -12,7 +12,7 @@ interface ParticlesProps {
   refresh?: boolean;
 }
 
-export const Particles = ({
+const Particles = ({
   className = "",
   quantity = 300,
   staticity = 200,
@@ -237,3 +237,5 @@ export const Particles = ({
     </div>
   );
 };
+
+export { Particles };
