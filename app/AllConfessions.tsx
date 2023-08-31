@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 // next
 import Link from "next/link";
 // hooks
@@ -29,6 +30,19 @@ const AllConfessions = () => {
   const { allConfessions, userConfessions, isLoading } = useProgram();
   const { publicKey } = useWallet();
 
+  const [displayedAllConfessions, setDisplayedAllConfessions] =
+    useState(allConfessions);
+  const [displayedUserConfessions, setDisplayedUserConfessions] =
+    useState(userConfessions);
+
+  useEffect(() => {
+    setDisplayedAllConfessions(allConfessions);
+  }, [allConfessions]);
+
+  useEffect(() => {
+    setDisplayedUserConfessions(userConfessions);
+  }, [userConfessions]);
+
   return (
     <div className="rounded-lg p-8 overflow-scroll flex flex-col gap-4 border border-border bg-muted/30 w-full h-[22rem] xl:h-[30rem] text-primary">
       {!publicKey ? (
@@ -51,43 +65,45 @@ const AllConfessions = () => {
           <TabsContent value="all">
             <div className="flex flex-col gap-4 py-4">
               <span className="text-sm self-end">
-                Found {allConfessions.length} confession/s
+                Found {displayedAllConfessions.length} confession/s
               </span>
-              {allConfessions.length > 0 ? (
+              {displayedAllConfessions.length > 0 ? (
                 <>
-                  {allConfessions.map((con: IConfession, i: number) => {
-                    const { publicKey, account } = con;
-                    const { authority, confession } = account;
-                    const strAuthority = authority.toString();
-                    const strPublicKey = publicKey.toString();
+                  {displayedAllConfessions.map(
+                    (con: IConfession, i: number) => {
+                      const { publicKey, account } = con;
+                      const { authority, confession } = account;
+                      const strAuthority = authority.toString();
+                      const strPublicKey = publicKey.toString();
 
-                    return (
-                      <div
-                        key={`${strAuthority}-${confession}-${i}`}
-                        className="w-full border border-border p-4 rounded-lg"
-                      >
-                        <div className="flex flex-col gap-8 justify-between">
-                          <p className="text-xl">{confession}</p>
+                      return (
+                        <div
+                          key={`${strAuthority}-${confession}-${i}`}
+                          className="w-full border border-border p-4 rounded-lg"
+                        >
+                          <div className="flex flex-col gap-8 justify-between">
+                            <p className="text-xl">{confession}</p>
 
-                          <div className="flex gap-4 self-end">
-                            <Link
-                              href={`https://explorer.solana.com/address/${strAuthority}?cluster=devnet`}
-                              className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
-                            >
-                              by: {shortenAddress(strAuthority)}
-                            </Link>
-                            <div className="w-[1px] bg-border"></div>
-                            <Link
-                              href={`https://explorer.solana.com/address/${strPublicKey}?cluster=devnet`}
-                              className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
-                            >
-                              pub: {shortenAddress(strPublicKey)}
-                            </Link>
+                            <div className="flex gap-4 self-end">
+                              <Link
+                                href={`https://explorer.solana.com/address/${strAuthority}?cluster=devnet`}
+                                className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
+                              >
+                                by: {shortenAddress(strAuthority)}
+                              </Link>
+                              <div className="w-[1px] bg-border"></div>
+                              <Link
+                                href={`https://explorer.solana.com/address/${strPublicKey}?cluster=devnet`}
+                                className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
+                              >
+                                pub: {shortenAddress(strPublicKey)}
+                              </Link>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    }
+                  )}
                 </>
               ) : (
                 <div className="flex w-full items-center justify-center">
@@ -99,43 +115,45 @@ const AllConfessions = () => {
           <TabsContent value="own">
             <div className="flex flex-col gap-4 py-4">
               <span className="text-sm self-end">
-                Found {userConfessions.length} confession/s
+                Found {displayedUserConfessions.length} confession/s
               </span>
-              {userConfessions.length > 0 ? (
+              {displayedUserConfessions.length > 0 ? (
                 <>
-                  {userConfessions.map((con: IConfession, i: number) => {
-                    const { publicKey, account } = con;
-                    const { authority, confession } = account;
-                    const strAuthority = authority.toString();
-                    const strPublicKey = publicKey.toString();
+                  {displayedUserConfessions.map(
+                    (con: IConfession, i: number) => {
+                      const { publicKey, account } = con;
+                      const { authority, confession } = account;
+                      const strAuthority = authority.toString();
+                      const strPublicKey = publicKey.toString();
 
-                    return (
-                      <div
-                        key={`${strAuthority}-${confession}-${i}`}
-                        className="w-full border border-border p-4 rounded-lg"
-                      >
-                        <div className="flex flex-col gap-8 justify-between">
-                          <p className="text-xl">{confession}</p>
+                      return (
+                        <div
+                          key={`${strAuthority}-${confession}-${i}`}
+                          className="w-full border border-border p-4 rounded-lg"
+                        >
+                          <div className="flex flex-col gap-8 justify-between">
+                            <p className="text-xl">{confession}</p>
 
-                          <div className="flex gap-4 self-end">
-                            <Link
-                              href={`https://explorer.solana.com/address/${strAuthority}?cluster=devnet`}
-                              className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
-                            >
-                              by: {shortenAddress(strAuthority)}
-                            </Link>
-                            <div className="w-[1px] bg-border"></div>
-                            <Link
-                              href={`https://explorer.solana.com/address/${strPublicKey}?cluster=devnet`}
-                              className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
-                            >
-                              pub: {shortenAddress(strPublicKey)}
-                            </Link>
+                            <div className="flex gap-4 self-end">
+                              <Link
+                                href={`https://explorer.solana.com/address/${strAuthority}?cluster=devnet`}
+                                className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
+                              >
+                                by: {shortenAddress(strAuthority)}
+                              </Link>
+                              <div className="w-[1px] bg-border"></div>
+                              <Link
+                                href={`https://explorer.solana.com/address/${strPublicKey}?cluster=devnet`}
+                                className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
+                              >
+                                pub: {shortenAddress(strPublicKey)}
+                              </Link>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    }
+                  )}
                 </>
               ) : (
                 <div className="flex w-full items-center justify-center">

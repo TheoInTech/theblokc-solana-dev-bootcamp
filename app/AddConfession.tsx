@@ -84,7 +84,11 @@ const AddConfession = () => {
   return (
     <>
       <div className="w-full flex gap-2 justify-end">
-        <Button variant={"ghost"} onClick={handleRefresh}>
+        <Button
+          variant={"ghost"}
+          onClick={handleRefresh}
+          disabled={isTransactionPending || !isInitialized}
+        >
           <RefreshCcw className="w-5 h-5 hover:animate-spin" />
         </Button>
         <Button
