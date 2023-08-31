@@ -2,26 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 29%;
+    --input: 0 0% 98%;
+    --ring: 0 0% 39%;
   }
 }
 
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Enable smooth scrolling */
+html,
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  scroll-behavior: smooth;
+  box-sizing: border-box;
+}
+
+/* Hide default scrollbar for Webkit browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 2px; /* Width of the vertical scrollbar */
+  height: 0px; /* Height of the horizontal scrollbar */
+}
+
+/* Remove scrollbar buttons for Webkit browsers */
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Scrollbar track (background) */
+::-webkit-scrollbar-track {
+  background-color: transparent; /* Make the track transparent */
+}
+
+/* Scrollbar handle (the moving part) */
+::-webkit-scrollbar-thumb {
+  background-color: hsl(0, 0%, 25%); /* Gray color */
+  border-radius: 3px; /* Slightly rounded corners */
+}
+
+/* Hide scrollbar for Firefox */
+body {
+  scrollbar-width: thin; /* Make it thin */
+  scrollbar-color: hsl(0, 0%, 25%) transparent; /* Thumb gray and track transparent */
+}
+
+/* Hide scrollbar for Internet Explorer and Edge */
+body::-ms-overflow-style {
+  display: none; /* Hide scrollbar */
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMousePosition } from "@/util/mouse";
+import { cn } from "@/lib/utils/cn";
+import { useMousePosition } from "@/lib/utils/mouse";
 import { useEffect, useRef } from "react";
 
 interface ParticlesProps {
@@ -11,13 +12,13 @@ interface ParticlesProps {
   refresh?: boolean;
 }
 
-export default function Particles({
+export const Particles = ({
   className = "",
-  quantity = 30,
-  staticity = 50,
-  ease = 50,
+  quantity = 300,
+  staticity = 200,
+  ease = 200,
   refresh = false,
-}: ParticlesProps) {
+}: ParticlesProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const context = useRef<CanvasRenderingContext2D | null>(null);
@@ -227,8 +228,12 @@ export default function Particles({
   };
 
   return (
-    <div className={className} ref={canvasContainerRef} aria-hidden="true">
+    <div
+      className={cn("fixed inset-0 -z-10 animate-fade-in", className)}
+      ref={canvasContainerRef}
+      aria-hidden="true"
+    >
       <canvas ref={canvasRef} />
     </div>
   );
-}
+};

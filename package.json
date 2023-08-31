@@ -6,20 +6,46 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "knip": "knip"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.1",
+    "@project-serum/anchor": "^0.26.0",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-separator": "^1.0.3",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@remix-run/react": "^1.19.3",
+    "@remix-run/server-runtime": "^1.19.3",
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-react": "^0.15.34",
+    "@solana/wallet-adapter-react-ui": "^0.9.33",
+    "@solana/wallet-adapter-wallets": "^0.19.20",
+    "@solana/web3.js": "^1.78.4",
+    "@svgr/webpack": "^8.1.0",
     "@types/node": "20.5.7",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
-    "eslint": "8.48.0",
-    "eslint-config-next": "13.4.19",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "lucide-react": "^0.271.0",
     "next": "13.4.19",
     "postcss": "8.4.28",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.45.4",
+    "remix-utils": "^6.6.0",
+    "tailwind-merge": "^1.14.0",
     "tailwindcss": "3.3.3",
-    "typescript": "5.2.2"
+    "tailwindcss-animate": "^1.0.7",
+    "tailwindcss-radix": "^2.8.0",
+    "typescript": "5.2.2",
+    "zod": "^3.22.2"
+  },
+  "devDependencies": {
+    "eslint": "8.48.0",
+    "eslint-config-next": "13.4.19",
+    "knip": "^2.21.0"
   }
 }
