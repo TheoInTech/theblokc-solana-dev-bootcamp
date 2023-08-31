@@ -18,7 +18,7 @@ import {
   useWallet,
 } from "@solana/wallet-adapter-react";
 import { SystemProgram } from "@solana/web3.js";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const useProgram: any = () => {
   const { connection } = useConnection();
@@ -35,15 +35,18 @@ export const useProgram: any = () => {
   const [allConfessions, setAllConfessions] = useState<ProgramAccount[]>([]);
   const [lastConfession, setLastConfession] = useState<number>(0);
 
-  const provider = new AnchorProvider(connection, anchorWallet, {
-    preflightCommitment: commitmentLevel,
-  });
-
-  const program = new Program(
-    PROGRAM_INTERFACE,
-    PROGRAM_PUBKEY,
-    provider
-  ) as Program<SolanaConfessions>;
+  const program = useMemo(() => {
+    if (anchorWallet) {
+      const provider = new AnchorProvider(connection, anchorWallet, {
+        preflightCommitment: commitmentLevel,
+      });
+      return new Program(
+        PROGRAM_INTERFACE,
+        PROGRAM_PUBKEY,
+        provider
+      ) as Program<SolanaConfessions>;
+    }
+  }, [connection, anchorWallet]);
 
   const getAllConfessions = async () => {
     try {

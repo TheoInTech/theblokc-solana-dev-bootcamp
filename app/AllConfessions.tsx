@@ -64,11 +64,11 @@ const AllConfessions = () => {
           </TabsList>
           <TabsContent value="all">
             <div className="flex flex-col gap-4 py-4">
-              <span className="text-sm self-end">
-                Found {displayedAllConfessions.length} confession/s
-              </span>
               {displayedAllConfessions.length > 0 ? (
                 <>
+                  <span className="text-sm self-end">
+                    Found {displayedAllConfessions.length} confession/s
+                  </span>
                   {displayedAllConfessions.map(
                     (con: IConfession, i: number) => {
                       const { publicKey, account } = con;
@@ -114,11 +114,11 @@ const AllConfessions = () => {
           </TabsContent>
           <TabsContent value="own">
             <div className="flex flex-col gap-4 py-4">
-              <span className="text-sm self-end">
-                Found {displayedUserConfessions.length} confession/s
-              </span>
               {displayedUserConfessions.length > 0 ? (
                 <>
+                  <span className="text-sm self-end">
+                    Found {displayedUserConfessions.length} confession/s
+                  </span>
                   {displayedUserConfessions.map(
                     (con: IConfession, i: number) => {
                       const { publicKey, account } = con;

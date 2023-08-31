@@ -1,6 +1,7 @@
 "use client";
 
 //react
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 // form
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,13 +38,14 @@ const formSchema = z.object({
     .string()
     .min(1, "Confession must be 'something', if you know what I mean.")
     .max(
-      40,
-      "Oops, looks like you have a lot to confess. Try to keep it under 40 characters to save memory."
+      25,
+      "Oops, looks like you have a lot to confess. Try to keep it under 25 characters due to memory restrictions."
     ),
 });
 
 const AddConfession = () => {
   const { toast } = useToast();
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,12 +75,10 @@ const AddConfession = () => {
   const handleRefresh = async (e: any) => {
     e.preventDefault();
 
+    await router.refresh();
+
     await getAllConfessions();
     await findProfileAccounts();
-
-    toast({
-      title: "Refreshed confessions.",
-    });
   };
 
   return (

@@ -5,7 +5,7 @@ pub mod error;
 pub mod states;
 use crate::{constant::*, error::*, states::*};
 
-declare_id!("77rnDjSqMH4HPd4cKNV5ditDEA4zVBBpznKqpjPjeodH");
+declare_id!("HW8S61jHc151qYoTL3RkBeaWtL881SLnqVE9GqwDHiPL");
 
 #[program]
 pub mod solana_confessions {

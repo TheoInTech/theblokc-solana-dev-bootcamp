@@ -38,6 +38,6 @@ Solana Confessions is a fun and secure decentralized application (dApp) built on
 
 ## Acknowledgments
 
-I want to thank the THE BLOKC mentors and the community behind this Solana Developers Bootcamp. More power to you guys!
+I want to thank THE BLOKC mentors and the community behind this Solana Developers Bootcamp. More power to you guys!
 
 Happy confessing! 🤐🚀
