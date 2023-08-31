@@ -2,6 +2,7 @@ import { Toaster } from "@/app/components/Toast";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Footer from "./Footer";
 import "./globals.css";
 import { WalletConnectProvider } from "./providers/WalletConnectProvider";
 
@@ -33,7 +34,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <WalletConnectProvider>
-          <main>{children}</main>
+          <main className="flex flex-col justify-center items-center">
+            {children}
+            <Footer />
+          </main>
           <Toaster />
         </WalletConnectProvider>
       </body>
