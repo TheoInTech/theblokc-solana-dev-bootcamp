@@ -21,7 +21,7 @@ export const WalletConnectProvider = ({
 
   const endpoint = useMemo(() => {
     if (network === WalletAdapterNetwork.Devnet)
-      return process.env.NEXT_PUBLIC_ALCHEMY_HTTPS;
+      return process.env.NEXT_PUBLIC_RPC_HTTPS;
 
     clusterApiUrl(network);
   }, [network]) as unknown as ConnectionProviderProps["endpoint"];

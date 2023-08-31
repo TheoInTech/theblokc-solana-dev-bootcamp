@@ -15,11 +15,11 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/app/components/AlertDialog";
+
 import { Button } from "@/app/components/Button";
 import {
   Form,
@@ -30,19 +30,20 @@ import {
   FormMessage,
 } from "@/app/components/Form";
 import { Textarea } from "@/app/components/Textarea";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCcw } from "lucide-react";
 
 const formSchema = z.object({
   confession: z
     .string()
     .min(1, "Confession must be 'something', if you know what I mean.")
     .max(
-      200,
-      "Oops, looks like you have a lot to confess. Try to keep it under 200 characters."
+      40,
+      "Oops, looks like you have a lot to confess. Try to keep it under 40 characters to save memory."
     ),
 });
 
 const AddConfession = () => {
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,67 +51,80 @@ const AddConfession = () => {
     },
   });
 
-  const { addConfession, isTransactionPending, successMessage } = useProgram();
-  const { toast } = useToast();
+  const {
+    addConfession,
+    isTransactionPending,
+    isInitialized,
+    getAllConfessions,
+    findProfileAccounts,
+  } = useProgram();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const response = await addConfession(values.confession);
-    console.log("response", response);
 
     if (response && !("error" in response)) {
-      toast({
-        variant: "default",
-        title: "You just confessed! 😮",
-        description: successMessage,
-      });
       form.reset();
       setIsModalOpen(false);
     }
   };
 
+  const handleRefresh = async (e: any) => {
+    e.preventDefault();
+
+    await getAllConfessions();
+    await findProfileAccounts();
+
+    toast({
+      title: "Refreshed confessions.",
+    });
+  };
+
   return (
     <>
-      <Button
-        isLoading={isTransactionPending}
-        onClick={() => setIsModalOpen(true)}
-        className="self-end"
-      >
-        Confess.
-      </Button>
+      <div className="w-full flex gap-2 justify-end">
+        <Button variant={"ghost"} onClick={handleRefresh}>
+          <RefreshCcw className="w-5 h-5 hover:animate-spin" />
+        </Button>
+        <Button
+          isLoading={isTransactionPending}
+          onClick={() => setIsModalOpen(true)}
+          disabled={isTransactionPending || !isInitialized}
+        >
+          Confess
+        </Button>
+      </div>
       <AlertDialog open={isModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>What would you like to confess?</AlertDialogTitle>
-            <AlertDialogDescription>
-              <Form {...form}>
-                <form className="space-y-8">
-                  <FormField
-                    control={form.control}
-                    name="confession"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Textarea
-                            placeholder="I did something..."
-                            minLength={1}
-                            maxLength={200}
-                            className="resize-none"
-                            disabled={isTransactionPending}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Don&apos;t worry, your secret is safe with us 🤫
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-            </AlertDialogDescription>
+            <Form {...form}>
+              <form className="space-y-8">
+                <FormField
+                  control={form.control}
+                  name="confession"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          placeholder="I did something..."
+                          minLength={1}
+                          maxLength={200}
+                          className="resize-none"
+                          disabled={isTransactionPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Don&apos;t worry, your secret is safe with us 🤫
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel

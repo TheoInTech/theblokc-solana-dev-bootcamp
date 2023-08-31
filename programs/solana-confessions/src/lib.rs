@@ -11,9 +11,7 @@ declare_id!("77rnDjSqMH4HPd4cKNV5ditDEA4zVBBpznKqpjPjeodH");
 pub mod solana_confessions {
     use super::*;
 
-    pub fn initialize_user(
-        ctx: Context<InitializeUser>
-    ) -> Result<()> {
+    pub fn initialize_user(ctx: Context<InitializeUser>) -> Result<()> {
         // Initialize user profile with default data
         let user_profile = &mut ctx.accounts.user_profile;
         user_profile.authority = ctx.accounts.authority.key();
@@ -23,17 +21,8 @@ pub mod solana_confessions {
         msg!("Initialized user: {}", user_profile.authority);
         Ok(())
     }
-    // Add a USER_PROFILE to the blockchain
-    // Add values for the default data
 
-    // See CONFESSIONS board
-
-    // Add a CONFESSION
-
-    pub fn add_confession(
-        ctx: Context<AddConfession>,
-        _confession: String
-    ) -> Result<()> {
+    pub fn add_confession(ctx: Context<AddConfession>, _confession: String) -> Result<()> {
         let confession_account = &mut ctx.accounts.confession_account;
         let user_profile = &mut ctx.accounts.user_profile;
 
@@ -46,29 +35,32 @@ pub mod solana_confessions {
         confession_account.confession = _confession;
 
         // Increase confession idx for PDA
-        user_profile.last_confession = user_profile.last_confession
-            .checked_add(1)
-            .unwrap();
+        user_profile.last_confession = user_profile.last_confession.checked_add(1).unwrap();
 
         // Increase total confessions count
-        user_profile.confessions_count = user_profile.confessions_count
-            .checked_add(1)
-            .unwrap();
+        user_profile.confessions_count = user_profile.confessions_count.checked_add(1).unwrap();
 
-        msg!("Added confession '{}' from {}", confession_account.confession, user_profile.authority);
-        msg!("User {} has now a total of {} confessions", user_profile.authority, user_profile.confessions_count);
-        
+        msg!(
+            "Added confession '{}' from {}",
+            confession_account.confession,
+            user_profile.authority
+        );
+        msg!(
+            "User {} has now a total of {} confessions",
+            user_profile.authority,
+            user_profile.confessions_count
+        );
+
         Ok(())
     }
 
-    // Retrieve all CONFESSIONS for the board again
 }
 
 #[derive(Accounts)]
 #[instruction()]
 pub struct InitializeUser<'info> {
     #[account(mut)]
-    pub authority:Signer<'info>,
+    pub authority: Signer<'info>,
 
     #[account(
         init,
@@ -106,4 +98,9 @@ pub struct AddConfession<'info> {
     pub authority: Signer<'info>,
 
     pub system_program: Program<'info, System>,
+}
+
+pub fn bump(seeds: &[&[u8]], program_id: &Pubkey) -> u8 {
+    let (_found_key, bump) = Pubkey::find_program_address(seeds, program_id);
+    bump
 }

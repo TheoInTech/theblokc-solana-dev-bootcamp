@@ -4,107 +4,149 @@
 import Link from "next/link";
 // hooks
 import { useProgram } from "@/app/hooks/useProgram";
+import { useWallet } from "@solana/wallet-adapter-react";
 // utils
 import { shortenAddress } from "@/lib/utils/shortenAddress";
+// components
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/app/components/Tabs";
+import { ArrowUp, Loader2 } from "lucide-react";
 
-const dummyConfessions = [
-  {
-    author: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    tx: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    confession: "I love my wife",
-  },
-  {
-    author: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    tx: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    confession:
-      "I love my wife. This is a pretty long confession. I know i know. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-  },
-  {
-    author: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    tx: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    confession: "I love my wife",
-  },
-  {
-    author: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    tx: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    confession:
-      "I love my wife. This is a pretty long confession. I know i know. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-  },
-  {
-    author: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    tx: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    confession: "I love my wife",
-  },
-  {
-    author: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    tx: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    confession:
-      "I love my wife. This is a pretty long confession. I know i know. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-  },
-  {
-    author: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    tx: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    confession: "I love my wife",
-  },
-  {
-    author: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    tx: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    confession:
-      "I love my wife. This is a pretty long confession. I know i know. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-  },
-  {
-    author: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    tx: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    confession: "I love my wife",
-  },
-  {
-    author: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    tx: "AqtqBLXk4NGppf5qBWgC6PSLrqEqdB2ECzWh4hVJ2qQN",
-    confession:
-      "I love my wife. This is a pretty long confession. I know i know. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-  },
-];
+interface IAccount {
+  authority: string;
+  confession: string;
+}
+interface IConfession {
+  publicKey: string;
+  account: IAccount;
+}
 
 const AllConfessions = () => {
-  const { isLoading, program, isInitialized, allConfessions, userConfessions } =
-    useProgram();
+  const { allConfessions, userConfessions, isLoading } = useProgram();
+  const { publicKey } = useWallet();
 
   return (
-    <div className="rounded-lg p-8 overflow-scroll flex flex-col items-center justify-center gap-4 bg-muted/30 w-full h-[22rem] text-primary backdrop-blur-sm">
-      {allConfessions.length > 0 ? (
-        <>
-          {/* Change to actual all confessions */}
-          {dummyConfessions.map(({ confession, author, tx }, i) => (
-            <div
-              key={`${author}-${confession}-${i}`}
-              className="w-full border border-border p-4 rounded-lg"
-            >
-              <div className="flex flex-col gap-8 justify-between">
-                <p className="text-xl">{confession}</p>
-
-                <div className="flex gap-4 self-end">
-                  <Link
-                    href={`https://explorer.solana.com/address/${author}?cluster=devnet`}
-                    className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
-                  >
-                    by: {shortenAddress(author)}
-                  </Link>
-                  <div className="w-[1px] bg-border"></div>
-                  <Link
-                    href={`https://explorer.solana.com/address/${tx}?cluster=devnet`}
-                    className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
-                  >
-                    tx: {shortenAddress(tx)}
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-        </>
-      ) : (
-        <div className="flex w-full items-center justify-center">
-          <p className="text-xl">No confessions yet. Be the first.</p>
+    <div className="rounded-lg p-8 overflow-scroll flex flex-col gap-4 border border-border bg-muted/30 w-full h-[22rem] xl:h-[30rem] text-primary">
+      {!publicKey ? (
+        <div className="flex flex-col gap-4 w-full items-center justify-center">
+          <ArrowUp className="w-8 h-8 animate-bounce" />
+          <p className="text-xl">
+            Please sign in first using your Phantom wallet
+          </p>
         </div>
+      ) : isLoading ? (
+        <div className="flex w-full h-full items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      ) : (
+        <Tabs defaultValue="all">
+          <TabsList className="flex justify-start py-6 text-primary">
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="own">Own</TabsTrigger>
+          </TabsList>
+          <TabsContent value="all">
+            <div className="flex flex-col gap-4 py-4">
+              <span className="text-sm self-end">
+                Found {allConfessions.length} confession/s
+              </span>
+              {allConfessions.length > 0 ? (
+                <>
+                  {allConfessions.map((con: IConfession, i: number) => {
+                    const { publicKey, account } = con;
+                    const { authority, confession } = account;
+                    const strAuthority = authority.toString();
+                    const strPublicKey = publicKey.toString();
+
+                    return (
+                      <div
+                        key={`${strAuthority}-${confession}-${i}`}
+                        className="w-full border border-border p-4 rounded-lg"
+                      >
+                        <div className="flex flex-col gap-8 justify-between">
+                          <p className="text-xl">{confession}</p>
+
+                          <div className="flex gap-4 self-end">
+                            <Link
+                              href={`https://explorer.solana.com/address/${strAuthority}?cluster=devnet`}
+                              className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
+                            >
+                              by: {shortenAddress(strAuthority)}
+                            </Link>
+                            <div className="w-[1px] bg-border"></div>
+                            <Link
+                              href={`https://explorer.solana.com/address/${strPublicKey}?cluster=devnet`}
+                              className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
+                            >
+                              pub: {shortenAddress(strPublicKey)}
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : (
+                <div className="flex w-full items-center justify-center">
+                  <p className="text-xl">No confessions yet. Be the first.</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="own">
+            <div className="flex flex-col gap-4 py-4">
+              <span className="text-sm self-end">
+                Found {userConfessions.length} confession/s
+              </span>
+              {userConfessions.length > 0 ? (
+                <>
+                  {userConfessions.map((con: IConfession, i: number) => {
+                    const { publicKey, account } = con;
+                    const { authority, confession } = account;
+                    const strAuthority = authority.toString();
+                    const strPublicKey = publicKey.toString();
+
+                    return (
+                      <div
+                        key={`${strAuthority}-${confession}-${i}`}
+                        className="w-full border border-border p-4 rounded-lg"
+                      >
+                        <div className="flex flex-col gap-8 justify-between">
+                          <p className="text-xl">{confession}</p>
+
+                          <div className="flex gap-4 self-end">
+                            <Link
+                              href={`https://explorer.solana.com/address/${strAuthority}?cluster=devnet`}
+                              className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
+                            >
+                              by: {shortenAddress(strAuthority)}
+                            </Link>
+                            <div className="w-[1px] bg-border"></div>
+                            <Link
+                              href={`https://explorer.solana.com/address/${strPublicKey}?cluster=devnet`}
+                              className="text-sm text-purple-400 hover:underline hover:underline-offset-4"
+                            >
+                              pub: {shortenAddress(strPublicKey)}
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : (
+                <div className="flex w-full items-center justify-center">
+                  <p className="text-xl">
+                    No confessions yet. Write your first.
+                  </p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );

@@ -1,122 +1,114 @@
 "use client";
 
+import { useToast } from "@/app/components/Toast/useToast";
 import {
   PROGRAM_INTERFACE,
   PROGRAM_PUBKEY,
   commitmentLevel,
 } from "@/lib/constants";
+import { SolanaConfessions } from "@/lib/types/solana-confessions.types";
 import { getFilteredAuthor } from "@/lib/utils/getFilteredAuthor";
 import { AnchorProvider, Program, ProgramAccount } from "@project-serum/anchor";
 import { utf8 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import {
+  AnchorWallet,
   useAnchorWallet,
   useConnection,
   useWallet,
 } from "@solana/wallet-adapter-react";
 import { SystemProgram } from "@solana/web3.js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-export const useProgram = () => {
+export const useProgram: any = () => {
   const { connection } = useConnection();
   const { publicKey } = useWallet();
-  const anchorWallet = useAnchorWallet();
+  const anchorWallet = useAnchorWallet() as AnchorWallet;
+  const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isTransactionPending, setIsTransactionPending] =
     useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [userConfessions, setUserConfessions] = useState<ProgramAccount[]>([]);
   const [allConfessions, setAllConfessions] = useState<ProgramAccount[]>([]);
   const [lastConfession, setLastConfession] = useState<number>(0);
 
-  const program = useMemo(() => {
-    if (anchorWallet) {
-      const provider = new AnchorProvider(connection, anchorWallet, {
-        preflightCommitment: commitmentLevel,
+  const provider = new AnchorProvider(connection, anchorWallet, {
+    preflightCommitment: commitmentLevel,
+  });
+
+  const program = new Program(
+    PROGRAM_INTERFACE,
+    PROGRAM_PUBKEY,
+    provider
+  ) as Program<SolanaConfessions>;
+
+  const getAllConfessions = async () => {
+    try {
+      setIsLoading(true);
+      const confessions: any = await program!.account.confessionAccount.all();
+
+      setAllConfessions(confessions);
+    } catch (error) {
+      console.error(error);
+
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          "There's an error getting all confessions. Please try to refresh the page.",
       });
-      return new Program(PROGRAM_INTERFACE, PROGRAM_PUBKEY, provider);
+
+      setAllConfessions([]);
+    } finally {
+      setIsLoading(false);
     }
-  }, [connection, anchorWallet]);
+  };
 
-  useEffect(() => {
-    const findProfileAccounts = async () => {
-      if (isInitialized && program && publicKey && !isTransactionPending) {
-        try {
-          setIsLoading(true);
-          const [profilePda, _profileBump] = await findProgramAddressSync(
-            [utf8.encode("USER_STATE"), publicKey.toBuffer()],
-            program.programId
-          );
-          const profileAccount: any = await program.account.userProfile.fetch(
-            profilePda
-          );
+  const findProfileAccounts = async () => {
+    try {
+      setIsLoading(true);
+      const [profilePda, _profileBump] = await findProgramAddressSync(
+        [utf8.encode("USER_STATE"), publicKey!.toBuffer()],
+        program!.programId
+      );
 
-          console.log("profileAccount", profileAccount);
+      const profileAccount: any = await program!.account.userProfile.fetch(
+        profilePda
+      );
 
-          if (profileAccount) {
-            setLastConfession(profileAccount.lastConfession);
-            setIsInitialized(true);
+      if (profileAccount) {
+        toast({
+          variant: "default",
+          title: "You are already signed in, you may now confess...",
+        });
+        setLastConfession(profileAccount.lastConfession);
+        setIsInitialized(true);
 
-            const confessionAccount: ProgramAccount[] =
-              await program.account.confessionAccount.all([
-                getFilteredAuthor(publicKey.toString()),
-              ]);
-            setUserConfessions(confessionAccount);
-          } else {
-            setIsInitialized(false);
-          }
-        } catch (error) {
-          console.error(error);
-          setIsInitialized(false);
-          setUserConfessions([]);
-        } finally {
-          setIsLoading(false);
-        }
+        const confessionAccount: any =
+          await program!.account.confessionAccount.all([
+            getFilteredAuthor(publicKey!.toString()),
+          ]);
+
+        setUserConfessions(confessionAccount);
       }
-    };
+    } catch (error) {
+      console.error(error);
+      setUserConfessions([]);
 
-    const getAllConfessions = async () => {
-      if (program && publicKey && !isTransactionPending) {
-        try {
-          setIsLoading(true);
-          const confessions = await program.account.confessionAccount.all([]);
-
-          setAllConfessions(confessions);
-        } catch (error) {
-          console.error(error);
-          setIsInitialized(false);
-          setAllConfessions([]);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    findProfileAccounts();
-    getAllConfessions();
-  }, [publicKey, program, isTransactionPending, isInitialized]);
-
-  const resetStates = () => {
-    setErrorMessage("");
-    setSuccessMessage("");
-    setIsLoading(false);
-    setIsTransactionPending(false);
+      if (!isInitialized) await initializeUser();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const initializeUser = async () => {
-    resetStates();
-    if (program && publicKey) {
+    if (program && publicKey && !isInitialized) {
       try {
-        const isAlreadyInitialized = await program.account.userProfile.all([
-          getFilteredAuthor(publicKey.toString()),
-        ]);
-
         setIsTransactionPending(true);
-        const [profilePda, profileBump] = findProgramAddressSync(
+        const [profilePda, _profileBump] = findProgramAddressSync(
           [utf8.encode("USER_STATE"), publicKey.toBuffer()],
           program.programId
         );
@@ -132,8 +124,14 @@ export const useProgram = () => {
 
         setIsInitialized(true);
       } catch (error: any) {
-        console.error(error);
-        setErrorMessage(error);
+        console.error("initializeUser error:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description:
+            error?.message ??
+            "There's an error signing in. Please try to refresh the page.",
+        });
       } finally {
         setIsTransactionPending(false);
       }
@@ -141,10 +139,14 @@ export const useProgram = () => {
   };
 
   const addConfession = async (confession: string) => {
-    resetStates();
+    setIsTransactionPending(false);
     if (program && publicKey) {
       if (!confession) {
-        setErrorMessage("Please enter a confession.");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Please enter a confession.",
+        });
         return;
       }
 
@@ -173,14 +175,24 @@ export const useProgram = () => {
           })
           .rpc();
 
-        setSuccessMessage(
-          "Your confession is now forever in the blockchain, anonymously."
-        );
+        toast({
+          variant: "default",
+          title:
+            "Your confession is now forever in the blockchain, anonymously.",
+        });
         setIsTransactionPending(false);
+
+        await getAllConfessions();
+        await findProfileAccounts();
+
         return { success: tx };
       } catch (error: any) {
         console.error(error);
-        setErrorMessage(error);
+        toast({
+          variant: "destructive",
+          title:
+            "There's an error saving your confession. Please try to refresh the page.",
+        });
         setIsTransactionPending(false);
 
         return { error };
@@ -188,9 +200,15 @@ export const useProgram = () => {
     }
   };
 
+  useEffect(() => {
+    if (!isInitialized && program && publicKey && !isTransactionPending) {
+      findProfileAccounts();
+      getAllConfessions();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicKey, program, isTransactionPending]);
+
   return {
-    errorMessage,
-    successMessage,
     isTransactionPending,
     isLoading,
     isInitialized,
@@ -199,6 +217,8 @@ export const useProgram = () => {
 
     addConfession,
     initializeUser,
+    getAllConfessions,
+    findProfileAccounts,
     program,
   };
 };
