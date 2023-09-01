@@ -114,10 +114,6 @@ export const ProgramProvider = ({ children }: { children: ReactNode }) => {
       );
 
       if (profileAccount) {
-        toast({
-          variant: "default",
-          title: "You are already signed in, you may now confess...",
-        });
         setLastConfession(profileAccount.lastConfession);
         setIsInitialized(true);
 
