@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 // hooks
 import { useToast } from "@/app/components/Toast/useToast";
-import { useProgram } from "@/app/hooks/useProgram";
+import { useProgram } from "@/app/context/ProgramContext";
 // components
 import {
   AlertDialog,
@@ -75,7 +75,12 @@ const AddConfession = () => {
   const handleRefresh = async (e: any) => {
     e.preventDefault();
 
-    await window.location.reload();
+    await getAllConfessions();
+    await findProfileAccounts();
+
+    toast({
+      title: "Refreshed confessions.",
+    });
   };
 
   return (

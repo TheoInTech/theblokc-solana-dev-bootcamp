@@ -1,10 +1,11 @@
+import Footer from "@/app/Footer";
 import { Toaster } from "@/app/components/Toast";
+import { ProgramProvider } from "@/app/context/ProgramContext";
+import { WalletConnectProvider } from "@/app/providers/WalletConnectProvider";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Footer from "./Footer";
 import "./globals.css";
-import { WalletConnectProvider } from "./providers/WalletConnectProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,11 +35,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <WalletConnectProvider>
-          <main className="flex flex-col justify-center items-center">
-            {children}
-            <Footer />
-          </main>
-          <Toaster />
+          <ProgramProvider>
+            <main className="flex flex-col justify-center items-center">
+              {children}
+              <Footer />
+            </main>
+            <Toaster />
+          </ProgramProvider>
         </WalletConnectProvider>
       </body>
     </html>

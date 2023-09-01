@@ -18,9 +18,40 @@ import {
   useWallet,
 } from "@solana/wallet-adapter-react";
 import { SystemProgram } from "@solana/web3.js";
-import { useEffect, useMemo, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-export const useProgram: any = () => {
+interface IProgramContext {
+  isTransactionPending: boolean;
+  isLoading: boolean;
+  isInitialized: boolean;
+  allConfessions: ProgramAccount[];
+  userConfessions: ProgramAccount[];
+  addConfession: (confession: string) => Promise<any>;
+  initializeUser: () => Promise<any>;
+  getAllConfessions: () => Promise<any>;
+  findProfileAccounts: () => Promise<any>;
+}
+
+const ProgramContext = createContext<IProgramContext>({
+  isTransactionPending: false,
+  isLoading: false,
+  isInitialized: false,
+  allConfessions: [],
+  userConfessions: [],
+  addConfession: async () => {},
+  initializeUser: async () => {},
+  getAllConfessions: async () => {},
+  findProfileAccounts: async () => {},
+});
+
+export const ProgramProvider = ({ children }: { children: ReactNode }) => {
   const { connection } = useConnection();
   const { publicKey } = useWallet();
   const anchorWallet = useAnchorWallet() as AnchorWallet;
@@ -211,17 +242,30 @@ export const useProgram: any = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey, program, isTransactionPending]);
 
-  return {
+  const exposed: IProgramContext = {
     isTransactionPending,
     isLoading,
     isInitialized,
     allConfessions,
     userConfessions,
-
     addConfession,
     initializeUser,
     getAllConfessions,
     findProfileAccounts,
-    program,
   };
+
+  return (
+    <ProgramContext.Provider value={exposed}>
+      {children}
+    </ProgramContext.Provider>
+  );
+};
+
+export const useProgram = () => {
+  let context = useContext(ProgramContext);
+  if (context === undefined) {
+    throw new Error("useProgram must be used inside ProgramProvider");
+  } else {
+    return context;
+  }
 };
