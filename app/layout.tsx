@@ -3,6 +3,7 @@ import { Toaster } from "@/app/components/Toast";
 import { ProgramProvider } from "@/app/context/ProgramContext";
 import { WalletConnectProvider } from "@/app/providers/WalletConnectProvider";
 import "@solana/wallet-adapter-react-ui/styles.css";
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -39,6 +40,7 @@ export default function RootLayout({
             <main className="flex flex-col justify-center items-center">
               {children}
               <Footer />
+              <Analytics />
             </main>
             <Toaster />
           </ProgramProvider>
